@@ -1,72 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-  </head>
-  <style>
+</head>
+<style>
     body {
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #181818;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #181818;
     }
+
     canvas {
-      border: 1px solid black;
-      border-radius: 5px;
+        border: 1px solid black;
+        border-radius: 5px;
     }
-  </style>
-  <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.3/p5.js" integrity="sha512-hh+SgsBq/fi/sP+im6v2IxfQnEnqmT+K6HTb6GjXdyWo5MIRmVsGdXkM+L5xspw1+bXvdva/vvPs0wezzsY7Zg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</style>
+
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.3/p5.js"
+        integrity="sha512-hh+SgsBq/fi/sP+im6v2IxfQnEnqmT+K6HTb6GjXdyWo5MIRmVsGdXkM+L5xspw1+bXvdva/vvPs0wezzsY7Zg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
-      class Bullet {
-        constructor(angle, radius, speed = 0.05) {
-          this.angle = angle;
-          this.radius = radius;
-          this.speed = speed;
+        class Bullet {
+            constructor(angle, radius, direction, speed = 0.5) {
+                this.position = createVector(width / 2, height / 2);
+                this.angle = angle;
+                this.radius = radius;
+                this.speed = speed;
+                this.direction = direction;
+                this.colors=[
+                    'red',
+                    'green',
+                    'blue',
+                    'yellow',
+                ];
+                this.color = this.colors[Math.floor(Math.random()*this.colors.length)];
+            }
+
+            move() {
+                this.angle += this.speed; // Incrementar el ángulo para hacer que la bala rote
+                this.position.add(p5.Vector.mult(this.direction, this.speed));
+            }
+
+            display() {
+                const x = width / 2 + this.radius * cos(this.angle);
+                const y = height / 2 + this.radius * sin(this.angle);
+                ellipse(this.position.x, this.position.y, 10, 10); // Dibujar la bala en la nueva posición
+                //quiero las balas rojas
+                
+                //quiero que cada bala tenga un color diferente
+                fill(this.color);
+            }
         }
 
-        move() {
-          this.angle += this.speed; // Incrementar el ángulo para hacer que la bala rote
+        let bullets = [];
+
+        function setup() {
+            createCanvas(800, 600);
+            angleMode(RADIANS);
         }
 
-        display() {
-          const x = width / 2 + this.radius * cos(this.angle);
-          const y = height / 2 + this.radius * sin(this.angle);
-          ellipse(x, y, 10, 10); // Dibujar la bala en la nueva posición
+        function draw() {
+            background(220);
+
+            if (frameCount % 60 === 0) {
+                for (let angle = 0; angle < TWO_PI; angle += TWO_PI / 5) {
+                    let direction = createVector(cos(angle), sin(angle));
+                    let bullet = new Bullet(angle, random(50, 150), direction); // Ajusta el radio de la rotación
+                    bullets.push(bullet);
+                }
+            }
+
+            for (let bullet of bullets) {
+                bullet.move();
+                bullet.display();
+            }
+
+            bullets = bullets.filter(
+                (bullet) =>
+                    bullet.radius <= Math.max(width, height) // Filtrar balas fuera de la pantalla
+            );
         }
-      }
-
-      let bullets = [];
-
-      function setup() {
-        createCanvas(800, 600);
-        angleMode(RADIANS);
-      }
-
-      function draw() {
-        background(220);
-
-        if (frameCount % 60 === 0) {
-          for (let angle = 0; angle < TWO_PI; angle += TWO_PI / 5) {
-            let bullet = new Bullet(angle, random(50, 150)); // Ajusta el radio de la rotación
-            bullets.push(bullet);
-          }
-        }
-
-        for (let bullet of bullets) {
-          bullet.move();
-          bullet.display();
-        }
-
-        bullets = bullets.filter(
-          (bullet) =>
-            bullet.radius <= Math.max(width, height) // Filtrar balas fuera de la pantalla
-        );
-      }
     </script>
-  </body>
+</body>
+
 </html>
